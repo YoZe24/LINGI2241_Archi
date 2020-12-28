@@ -7,59 +7,50 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientLaunch {
-
-    // Constantes
-    static ArrayList<String> requestsDB;
-    //static String host = "149.126.75.6";
-
-    //static String host = "192.168.0.12";
-    static String host = "192.168.0.12";
-    static final int port = 4444;
-    static final int nbClients = 50;
-    static final Random rand = new Random();
-    static long start;
-    static int cpt = 0;
-    static AtomicInteger CPT = new AtomicInteger(0);
-    static float avg = 0;
-    static List<Long> times;
-
-    static final float REQUEST_PACE = (float) 2; // 1 requête toutes les X secondes
-    static final float LAMBDA = (float) 1/(REQUEST_PACE * 1000);
-    static final int NB_REQUEST_PER_SEQ = 1;
-    static final int NB_REQUEST = NB_REQUEST_PER_SEQ * 5;
-
     static final String easy = "easy.txt";
     static final String hard = "hard.txt";
     static final String medium = "medium.txt";
     static final String mixed = "mixed";
     static final String network = "network.txt";
 
-    static final String difficulty = easy;
+    static String host = "192.168.0.12";
+    static final int port = 4444;
 
-    // Main
+    static final float REQUEST_PACE = (float) 2;
+    static final float LAMBDA = (float) 1/(REQUEST_PACE * 1000);
+    static final int nbClients = 50;
+    static final int NB_REQUEST = 5;
+
+    static final String difficulty = hard;
+    static final String numberOfThreadsServerSide = "2";
+    static final String serverType = "opti";
+
+    static AtomicInteger CPT = new AtomicInteger(0);
+    static ArrayList<String> requestsDB;
+    static List<Long> times;
+    static final Random rand = new Random();
+    static long start;
+    static float avg = 0;
+
     public static void main(String[] args) throws InterruptedException, IOException {
         generateRequests(difficulty);
-
-        times = new ArrayList<>();
-
         Thread[] threads = new Thread[nbClients + 1];
-
+        times = new ArrayList<>();
         start = System.currentTimeMillis();
 
         for (int i = 1; i <= nbClients; i++) {
             threads[i] = new Thread(new ClientThread(i + "", NB_REQUEST));
         }
 
-        for (int i = 1; i <= nbClients; i++)
+        for (int i = 1; i <= nbClients; i++){
             threads[i].start();
-        for (int i = 1; i <= nbClients; i++)
+        }
+
+        for (int i = 1; i <= nbClients; i++){
             threads[i].join();
-
-        System.out.println("Mean waiting time = " + avg / nbClients);
-
+        }
         finish();
-
-        writeToFile(times, "response_easy_simple" + difficulty);
+        writeToFile(times, "response_" + serverType + "_" + numberOfThreadsServerSide + "_" + difficulty);
     }
 
     public static void generateRequests(String difficulty) throws IOException {
@@ -112,6 +103,5 @@ public class ClientLaunch {
                 System.err.println("Couldn't get I/O for the connection to " + ClientLaunch.host);
             }
         }while(!send);
-
     }
 }

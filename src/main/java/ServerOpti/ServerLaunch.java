@@ -1,7 +1,5 @@
 package ServerOpti;
 
-
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -15,24 +13,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ServerLaunch {
-
-    // Constantes
     static final int port = 4444;
-    static final int nbThreads = 8;
+    static final int nbThreads = 2;
     static final int queueSize = 50;
     static final int N_TYPES = 6;
 
     static long cpt = 0;
-    static long avgTime = 0;
-    static long start;
     static List<Long> serviceTimes;
     static Protocol protocol;
-    // Base de données
-    public static ArrayList<String>[] DATABASE;
 
-    // Main
+    static ArrayList<String>[] DATABASE;
+
     public static void main(String[] args) throws IOException {
-        // Démarre le serveur et lit la database
         DATABASE = new ArrayList[N_TYPES];
         for(int i = 0; i < N_TYPES ; i++){
             DATABASE[i] = new ArrayList<>();
@@ -54,24 +46,19 @@ public class ServerLaunch {
             DATABASE[row].add(readLine.split("@@@")[1]);
         }
 
-        // Ouvre le serveur indéfiniment et traite les requêtes des clients qui arrivent
         try (ServerSocket serverSocket = new ServerSocket(port,queueSize);)
         {
             System.out.println("-> Server ready");
             System.out.println("-> Waiting for client...");
-            start = System.currentTimeMillis();
             int cpt = 0;
             while(true){
                 synchronized (serverSocket) {
-
                     Socket clientSocket = serverSocket.accept();
-                    System.out.println("Client " + ++cpt + " launched at : " + (System.currentTimeMillis()-start));
-                    pool.execute(new ServerThread(clientSocket,cpt));
+                    pool.execute(new ServerThread(clientSocket));
                 }
             }
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port " + port + " or listening for a connection");
-            System.out.println(e.getMessage());
         }
     }
 

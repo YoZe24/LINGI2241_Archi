@@ -9,10 +9,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ClientThread implements Runnable{
     private final String id;
     private int nb;
+    private long[] time;
     private AtomicInteger CPT_SEND;
     private AtomicInteger CPT_RECEIVE;
 
-    long time[];
     public ClientThread(String id, int nb) {
         this.id = id;
         this.nb = nb;
@@ -33,7 +33,9 @@ public class ClientThread implements Runnable{
         for (int i = 0; i < nb; i++) {
             try {
                 threads[i].join();
-            } catch (InterruptedException e) { e.printStackTrace(); }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -49,7 +51,6 @@ public class ClientThread implements Runnable{
                     String fromServer;
                     String fromUser;
 
-                    // Client request (On prend une requête au hasard)
                     int random = (int) (Math.random() * ClientLaunch.requestsDB.size());
                     fromUser = ClientLaunch.requestsDB.get(random);
 
@@ -60,7 +61,6 @@ public class ClientThread implements Runnable{
 
                     CPT_SEND.getAndIncrement();
                     while ((fromServer = in.readLine()) != null) {
-                        //System.out.println(fromServer);
                         if (fromServer.equals("")) {
                             time[cptSend] = System.currentTimeMillis() - start;
                             synchronized (ClientLaunch.times){
@@ -77,12 +77,10 @@ public class ClientThread implements Runnable{
                     System.err.println("Don't know about host " + ClientLaunch.host);
                 } catch (IOException e) {
                     System.err.println("Couldn't get I/O for the connection to " + ClientLaunch.host);
-                    //e.printStackTrace();
                 }
 
                 if(CPT_RECEIVE.get() == nb && CPT_SEND.get() == nb) {
                     ClientLaunch.CPT.addAndGet(CPT_RECEIVE.get()) ;
-                    //System.out.println("#Client sending " + id + " finished, nb request sended " + ClientLaunch.CPT.get() + " -------------------------------------------");
                     ClientLaunch.avg += Arrays.stream(time).average().getAsDouble();
                 }
             }while(!send);
@@ -94,7 +92,6 @@ public class ClientThread implements Runnable{
         double sleep = (ClientLaunch.exponential(ClientLaunch.LAMBDA));
         try {
             Thread.sleep((long) sleep);
-            //System.out.println(id + " : " +sleep);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

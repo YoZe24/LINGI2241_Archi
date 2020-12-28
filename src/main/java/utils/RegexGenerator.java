@@ -7,10 +7,15 @@ import java.util.List;
 import java.util.Random;
 
 public class RegexGenerator {
-    // Modify here :
+    /***
+     * Number of requests needed
+     * @param : int
+     */
     static final int numberNeeded = 1000;
 
-    // Don't touch
+    /***
+     * Variables needed in the program
+     */
     static final String[][] database = new String[2442236][2];
     static final Random rand = new Random();
     static ArrayList<StringBuilder> regexList = new ArrayList<>();
@@ -36,18 +41,27 @@ public class RegexGenerator {
         System.out.println("-> Generation finished !");
     }
 
+    /***
+     * Init function preparing the arraylist for the generation
+     */
     static void init(){
         for (int i = 0; i < numberNeeded; i++) {
             regexList.add(new StringBuilder());
         }
     }
 
+    /***
+     * Reset function reseting the arraylist after the generations
+     */
     static void reset(){
         for (int i = 0; i < numberNeeded; i++) {
             regexList.set(i, new StringBuilder());
         }
     }
 
+    /***
+     * Function that reads the database from file and load it into a variable in main memory
+     */
     static void readDB() throws IOException {
         int cpt = 0;
         String readLine = "";
@@ -62,6 +76,10 @@ public class RegexGenerator {
         }
     }
 
+    /***
+     * Function that generates random easy requests by taking random lines in the database file and stripping it to the 10 first words
+     * If a line contains some strange characters, takes the line after it
+     */
     static void generateEasy() throws IOException {
         int[] lines = rand.ints(1, 2442235).distinct().limit(numberNeeded).toArray();
 
@@ -95,6 +113,11 @@ public class RegexGenerator {
         writer.close();
     }
 
+    /***
+     * Function that generates medium requests by reading into the file and taking some random lines in it, and then takes the first phrase of it
+     * The type is simply set to all
+     * @throws IOException
+     */
     static void generateMedium() throws IOException {
         int[] lines = rand.ints(1, 2442235).distinct().limit(numberNeeded).toArray();
 
@@ -126,6 +149,11 @@ public class RegexGenerator {
         writer.close();
     }
 
+    /***
+     * Function that generates some random requests with high network demand, this is done by taking requests that match with a lot of results
+     * The time needed to print the result is expensive due to the big amount of data
+     * @throws IOException
+     */
     static void generateNetwork() throws IOException {
         for (int i = 0; i < numberNeeded; i++) {
             int[] ints = rand.ints(1, 6).distinct().limit(2).toArray();
@@ -146,6 +174,11 @@ public class RegexGenerator {
         writer.close();
     }
 
+    /***
+     * Function that generates hard request by randomly taking a character and comparing it a lot
+     * This makes requests that need more CPU
+     * @throws IOException
+     */
     static void generateHard() throws IOException {
         for (int i = 0; i < numberNeeded; i++) {
             int[] ints = rand.ints(1, 6).distinct().limit(2).toArray();
@@ -168,6 +201,11 @@ public class RegexGenerator {
         writer.close();
     }
 
+    /***
+     * Function that takes randomly some requests from "EASY", "MEDIUM" and "HARD" file
+     * This shuffles the difficulty
+     * @throws IOException
+     */
     static void generateMixed() throws IOException {
         try {
             BufferedReader reader1 = new BufferedReader(new FileReader("src/main/resources/requests/easy.txt"));

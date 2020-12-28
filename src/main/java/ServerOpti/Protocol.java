@@ -19,17 +19,14 @@ public class Protocol {
     public String processInput(String clientInput) {
         long start = System.currentTimeMillis();
 
-        // Check si les arguments sont bons
         if(!clientInput.contains(";")){
             return ("Asked format : <types>;<regex>\n");
         }
 
-        // Récupère les arguments
         String[] input = clientInput.split(";");
 
         String cacheAnswer = cache.get(clientInput);
         if(cacheAnswer != null) {
-            System.out.println("Regex "+clientInput+" is in the cache --------------");
             ServerLaunch.serviceTimes.add(System.currentTimeMillis()-start);
             return cacheAnswer;
         }
@@ -39,16 +36,13 @@ public class Protocol {
             setTypes.addAll(Arrays.asList(input[0].split(",")));
         }
 
-        // Linear search
         Pattern p = Pattern.compile(input[1]);
         Matcher m;
-        int nbContains = 0;
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < N_TYPES; i++) {
             if(setTypes.size() == 0 || setTypes.contains(String.valueOf(i))){
                 for(String sentence : ServerLaunch.DATABASE[i]){
                     m = p.matcher(sentence);
-                    nbContains++;
                     if(m.find()) builder.append(sentence);
                 }
             }
@@ -57,7 +51,6 @@ public class Protocol {
         String answer = builder.toString();
         cache.add(clientInput,answer);
 
-        System.out.println("nb test : " + nbContains + " | computing time : " + (System.currentTimeMillis() - start));
         synchronized (ServerLaunch.serviceTimes) {
             ServerLaunch.serviceTimes.add(System.currentTimeMillis() - start);
         }

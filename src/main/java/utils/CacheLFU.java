@@ -39,7 +39,6 @@ public class CacheLFU {
                 for (Entry entry : map.values())
                     entry.freq /= 2;
             }
-
             map.remove(keyToRemove);
         }
         map.put(request, new Entry(response, 1));
@@ -72,7 +71,5 @@ public class CacheLFU {
             this.answer = response;
             this.freq = freq;
         }
-
-
     }
 }
