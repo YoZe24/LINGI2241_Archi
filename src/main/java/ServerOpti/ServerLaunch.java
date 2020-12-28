@@ -17,9 +17,9 @@ public class ServerLaunch {
     static final int port = 4444;
     static final int nbThreads = 5;
     static final int queueSize = 50;
-    static final int N = 24422376;
     static final int N_TYPES = 6;
 
+    static long start;
     static Protocol protocol;
     // Base de données
     public static ArrayList<String>[] DATABASE;
@@ -51,13 +51,13 @@ public class ServerLaunch {
         {
             System.out.println("-> Server ready");
             System.out.println("-> Waiting for client...");
-            long start = System.currentTimeMillis();
+            start = System.currentTimeMillis();
             int cpt = 0;
             while(true){
                 synchronized (serverSocket) {
                     Socket clientSocket = serverSocket.accept();
                     System.out.println("Client " + ++cpt + " launched at : " + (System.currentTimeMillis()-start));
-                    pool.execute(new ServerThread(clientSocket));
+                    pool.execute(new ServerThread(clientSocket,cpt));
                 }
             }
         } catch (IOException e) {

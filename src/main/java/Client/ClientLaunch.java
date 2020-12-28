@@ -1,9 +1,7 @@
 package Client;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ClientLaunch {
@@ -11,7 +9,7 @@ public class ClientLaunch {
     // Constantes
     static ArrayList<String> requestsDB;
 //    static String host = "192.168.1.52";
-//    static String host = "149.126.75.6";
+    static String host = "149.126.75.6";
 
     static String host = "192.168.0.12";
     static final int port = 4444;
@@ -23,13 +21,15 @@ public class ClientLaunch {
     static float avg = 0;
     static List<Long> times;
 
-    static final float REQUEST_PACE = (float) 2; // Une requête toutes les X secondes
+    static final float REQUEST_PACE = (float) 1; // Une requête toutes les X secondes
     static final float LAMBDA = (float) 1/(REQUEST_PACE * 1000);
     static final int NB_REQUEST_PER_SEQ = 1;
-    static final int NB_REQUEST = NB_REQUEST_PER_SEQ * 5;
+    static final int NB_REQUEST = NB_REQUEST_PER_SEQ * 10;
 
     static final String easy = "easy.txt";
     static final String hard = "hard.txt";
+    static final String medium = "medium.txt";
+    static final String mixed = "mixed";
     static final String network = "network.txt";
     static final String medium = "medium.txt";
 
@@ -59,12 +59,32 @@ public class ClientLaunch {
         System.out.println("The " + ClientLaunch.nbClients + " finished their requests in " + (System.currentTimeMillis() - ClientLaunch.start) / 1000. + " seconds");
         System.out.println("Mean waiting time = " + ClientLaunch.avg / ClientLaunch.nbClients);
 
-        ClientLaunch.writeToFile();
+        ClientLaunch.writeToFile(ClientLaunch.times,"results/response_time.txt");
     }
 
     public static void generateRequests(String difficulty) throws IOException {
         requestsDB = new ArrayList<>();
         BufferedReader reader = null;
+        /*if(difficulty.equals("mixed")){
+            try {
+                BufferedReader reader1 = new BufferedReader(new FileReader("src/main/resources/requests/easy.txt"));
+                BufferedReader reader2 = new BufferedReader(new FileReader("src/main/resources/requests/hard.txt"));
+                List<String> strings = new ArrayList<>();
+                for(int i = 0 ; i < 100 ; i++){
+                    if(i % 2 == 0){
+                        strings.add(reader1.readLine()+"\n");
+                    }else{
+                        strings.add(reader2.readLine()+"\n");
+                    }
+                }
+                Collections.shuffle(strings);
+                writeToFile(strings,"requests/mixed.txt");
+                requestsDB = (ArrayList<String>) strings;
+                return;
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+        }*/
         try {
             reader = new BufferedReader(new FileReader("src/main/resources/requests/" + difficulty));
         } catch (FileNotFoundException e) {
@@ -76,17 +96,20 @@ public class ClientLaunch {
         }
     }
 
-    public static void writeToFile() throws IOException {
+    public static void writeToFile(Collection collection,String fileName) throws IOException {
         FileWriter writer = null;
         try {
-            writer = new FileWriter("src/main/resources/results/response_time.txt");
+            writer = new FileWriter("src/main/resources/"+fileName);
         } catch (IOException e) {
-            writer = new FileWriter("results/response_time.txt");
+            writer = new FileWriter(fileName);
         }
         StringBuilder str = new StringBuilder();
-        for (Long time : times) {
-            str.append(time + "\n");
+        for(Object o: collection){
+            str.append(o.toString());
         }
+        /*for (Long time : times) {
+            str.append(time + "\n");
+        }*/
         writer.write(str.toString() + "\n");
         writer.close();
     }
