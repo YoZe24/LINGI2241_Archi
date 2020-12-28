@@ -34,7 +34,7 @@ public class ClientLaunch {
 
     // Main
     public static void main(String[] args) throws InterruptedException, IOException {
-        generateRequests(medium);
+        generateRequests(mixed);
         System.out.println("Lambda : "+LAMBDA + " NB request per batch "+NB_REQUEST_PER_SEQ+ " PACE "+REQUEST_PACE);
 
         times = new ArrayList<>();
@@ -67,13 +67,16 @@ public class ClientLaunch {
         /*if(difficulty.equals("mixed")){
             try {
                 BufferedReader reader1 = new BufferedReader(new FileReader("src/main/resources/requests/easy.txt"));
-                BufferedReader reader2 = new BufferedReader(new FileReader("src/main/resources/requests/hard.txt"));
+                BufferedReader reader2 = new BufferedReader(new FileReader("src/main/resources/requests/medium.txt"));
+                BufferedReader reader3 = new BufferedReader(new FileReader("src/main/resources/requests/hard.txt"));
                 List<String> strings = new ArrayList<>();
                 for(int i = 0 ; i < 100 ; i++){
-                    if(i % 2 == 0){
+                    if(i % 3 == 0){
                         strings.add(reader1.readLine()+"\n");
-                    }else{
+                    }else if(i % 3 == 1){
                         strings.add(reader2.readLine()+"\n");
+                    }else{
+                        strings.add(reader3.readLine()+"\n");
                     }
                 }
                 Collections.shuffle(strings);
@@ -106,9 +109,6 @@ public class ClientLaunch {
         for(Object o: collection){
             str.append(o.toString());
         }
-        /*for (Long time : times) {
-            str.append(time + "\n");
-        }*/
         writer.write(str.toString() + "\n");
         writer.close();
     }

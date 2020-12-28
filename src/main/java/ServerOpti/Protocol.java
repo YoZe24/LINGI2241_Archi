@@ -13,10 +13,12 @@ public class Protocol {
     private CacheLFU cache;
 
     public Protocol(){
-        cache = new CacheLFU(30,5);
+        cache = new CacheLFU(100,5);
     }
 
     public String processInput(String clientInput) {
+        long start = System.currentTimeMillis();
+
         // Check si les arguments sont bons
         if(!clientInput.contains(";")){
             return ("Asked format : <types>;<regex>\n");
@@ -28,6 +30,7 @@ public class Protocol {
         String cacheAnswer = cache.get(clientInput);
         if(cacheAnswer != null) {
             System.out.println("Regex "+clientInput+" is in the cache --------------");
+            ServerLaunch.serviceTimes.add(System.currentTimeMillis()-start);
             return cacheAnswer;
         }
 
@@ -40,7 +43,6 @@ public class Protocol {
         Pattern p = Pattern.compile(input[1]);
         Matcher m;
         int nbContains = 0;
-        long start = System.currentTimeMillis();
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < N_TYPES; i++) {
             if(setTypes.size() == 0 || setTypes.contains(String.valueOf(i))){
@@ -51,10 +53,14 @@ public class Protocol {
                 }
             }
         }
-        System.out.println("nb test : " + nbContains + " | computing time : " + (System.currentTimeMillis() - start));
         builder.append("\n");
         String answer = builder.toString();
         cache.add(clientInput,answer);
+
+        System.out.println("nb test : " + nbContains + " | computing time : " + (System.currentTimeMillis() - start));
+        synchronized (ServerLaunch.serviceTimes) {
+            ServerLaunch.serviceTimes.add(System.currentTimeMillis() - start);
+        }
         return answer;
     }
 }
