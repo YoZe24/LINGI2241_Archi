@@ -1,6 +1,8 @@
 package Client;
 
 import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -8,12 +10,12 @@ public class ClientLaunch {
 
     // Constantes
     static ArrayList<String> requestsDB;
-//    static String host = "192.168.1.52";
-    static String host = "149.126.75.6";
+    //static String host = "149.126.75.6";
 
+    //static String host = "192.168.0.12";
     static String host = "192.168.0.12";
     static final int port = 4444;
-    static final int nbClients = 10;
+    static final int nbClients = 50;
     static final Random rand = new Random();
     static long start;
     static int cpt = 0;
@@ -21,22 +23,22 @@ public class ClientLaunch {
     static float avg = 0;
     static List<Long> times;
 
-    static final float REQUEST_PACE = (float) 1; // Une requête toutes les X secondes
+    static final float REQUEST_PACE = (float) 2; // 1 requête toutes les X secondes
     static final float LAMBDA = (float) 1/(REQUEST_PACE * 1000);
     static final int NB_REQUEST_PER_SEQ = 1;
-    static final int NB_REQUEST = NB_REQUEST_PER_SEQ * 10;
+    static final int NB_REQUEST = NB_REQUEST_PER_SEQ * 5;
 
     static final String easy = "easy.txt";
     static final String hard = "hard.txt";
     static final String medium = "medium.txt";
     static final String mixed = "mixed";
     static final String network = "network.txt";
-    static final String medium = "medium.txt";
+
+    static final String difficulty = easy;
 
     // Main
     public static void main(String[] args) throws InterruptedException, IOException {
-        generateRequests(medium);
-        System.out.println("Lambda : "+LAMBDA + " NB request per batch "+NB_REQUEST_PER_SEQ+ " PACE "+REQUEST_PACE);
+        generateRequests(difficulty);
 
         times = new ArrayList<>();
 
@@ -45,8 +47,6 @@ public class ClientLaunch {
         start = System.currentTimeMillis();
 
         for (int i = 1; i <= nbClients; i++) {
-            //double sleep = exponential(LAMBDA);
-            //Thread.sleep((long) sleep);
             threads[i] = new Thread(new ClientThread(i + "", NB_REQUEST));
         }
 
@@ -55,36 +55,16 @@ public class ClientLaunch {
         for (int i = 1; i <= nbClients; i++)
             threads[i].join();
 
+        System.out.println("Mean waiting time = " + avg / nbClients);
 
-        System.out.println("The " + ClientLaunch.nbClients + " finished their requests in " + (System.currentTimeMillis() - ClientLaunch.start) / 1000. + " seconds");
-        System.out.println("Mean waiting time = " + ClientLaunch.avg / ClientLaunch.nbClients);
+        finish();
 
-        ClientLaunch.writeToFile(ClientLaunch.times,"results/response_time.txt");
+        writeToFile(times, "response_easy_simple" + difficulty);
     }
 
     public static void generateRequests(String difficulty) throws IOException {
         requestsDB = new ArrayList<>();
         BufferedReader reader = null;
-        /*if(difficulty.equals("mixed")){
-            try {
-                BufferedReader reader1 = new BufferedReader(new FileReader("src/main/resources/requests/easy.txt"));
-                BufferedReader reader2 = new BufferedReader(new FileReader("src/main/resources/requests/hard.txt"));
-                List<String> strings = new ArrayList<>();
-                for(int i = 0 ; i < 100 ; i++){
-                    if(i % 2 == 0){
-                        strings.add(reader1.readLine()+"\n");
-                    }else{
-                        strings.add(reader2.readLine()+"\n");
-                    }
-                }
-                Collections.shuffle(strings);
-                writeToFile(strings,"requests/mixed.txt");
-                requestsDB = (ArrayList<String>) strings;
-                return;
-            }catch (IOException e){
-                e.printStackTrace();
-            }
-        }*/
         try {
             reader = new BufferedReader(new FileReader("src/main/resources/requests/" + difficulty));
         } catch (FileNotFoundException e) {
@@ -99,22 +79,39 @@ public class ClientLaunch {
     public static void writeToFile(Collection collection,String fileName) throws IOException {
         FileWriter writer = null;
         try {
-            writer = new FileWriter("src/main/resources/"+fileName);
+            writer = new FileWriter("src/main/resources/results/" + fileName);
         } catch (IOException e) {
-            writer = new FileWriter(fileName);
+            writer = new FileWriter("results/" + fileName);
         }
+
         StringBuilder str = new StringBuilder();
         for(Object o: collection){
-            str.append(o.toString());
+            str.append(o.toString()).append("\n");
         }
-        /*for (Long time : times) {
-            str.append(time + "\n");
-        }*/
         writer.write(str.toString() + "\n");
         writer.close();
     }
 
     public static double exponential(float lambda) {
         return Math.log(1 - rand.nextDouble())/(- lambda);
+    }
+
+    public static void finish(){
+        boolean send = false;
+        do{
+            try (Socket socket = new Socket(ClientLaunch.host, ClientLaunch.port);
+                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            )
+            {
+                out.println("Exit.");
+                send = true;
+            } catch (UnknownHostException e) {
+                System.err.println("Don't know about host " + ClientLaunch.host);
+            } catch (IOException e) {
+                System.err.println("Couldn't get I/O for the connection to " + ClientLaunch.host);
+            }
+        }while(!send);
+
     }
 }

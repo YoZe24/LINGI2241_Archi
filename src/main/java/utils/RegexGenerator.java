@@ -2,6 +2,8 @@ package utils;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 public class RegexGenerator {
@@ -25,6 +27,9 @@ public class RegexGenerator {
 
         reset();
         generateHard();
+
+        reset();
+        generateMixed();
 
         reset();
         generateNetwork();
@@ -156,6 +161,38 @@ public class RegexGenerator {
             writer = new FileWriter("src/main/resources/requests/hard.txt");
         } catch (IOException e) {
             writer = new FileWriter("requests/hard.txt");
+        }
+        for (int i = 0; i < numberNeeded; i++) {
+            writer.write(regexList.get(i).toString() + "\n");
+        }
+        writer.close();
+    }
+
+    static void generateMixed() throws IOException {
+        try {
+            BufferedReader reader1 = new BufferedReader(new FileReader("src/main/resources/requests/easy.txt"));
+            BufferedReader reader2 = new BufferedReader(new FileReader("src/main/resources/requests/medium.txt"));
+            BufferedReader reader3 = new BufferedReader(new FileReader("src/main/resources/requests/hard.txt"));
+            for(int i = 0 ; i < numberNeeded ; i++){
+                if(i % 3 == 0){
+                    regexList.get(i).append(reader1.readLine());
+                }else if(i % 2 == 0){
+                    regexList.get(i).append(reader2.readLine());
+                }
+                else{
+                    regexList.get(i).append(reader3.readLine());
+                }
+            }
+            Collections.shuffle(regexList);
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter("src/main/resources/requests/mixed.txt");
+        } catch (IOException e) {
+            writer = new FileWriter("requests/mixed.txt");
         }
         for (int i = 0; i < numberNeeded; i++) {
             writer.write(regexList.get(i).toString() + "\n");
