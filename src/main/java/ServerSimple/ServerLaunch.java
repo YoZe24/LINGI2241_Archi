@@ -1,4 +1,4 @@
-package ServerV1;
+package ServerSimple;
 
 import java.io.*;
 import java.net.ServerSocket;

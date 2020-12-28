@@ -1,4 +1,6 @@
-package ServerV2;
+package ServerOpti;
+
+import utils.CacheLFU;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -8,6 +10,11 @@ import java.util.regex.Pattern;
 
 public class Protocol {
     private static final int N_TYPES = 6;
+    private CacheLFU cache;
+
+    public Protocol(){
+        cache = new CacheLFU(100,5);
+    }
 
     public String processInput(String clientInput) {
         // Check si les arguments sont bons
@@ -17,6 +24,12 @@ public class Protocol {
 
         // Récupère les arguments
         String[] input = clientInput.split(";");
+
+        String cacheAnswer = cache.get(clientInput);
+        if(cacheAnswer != null) {
+            System.out.println("Regex "+clientInput+" is in the cache --------------");
+            return cacheAnswer;
+        }
 
         Set<String> setTypes = new TreeSet<String>();
         if(!input[0].equals("")){
@@ -40,6 +53,8 @@ public class Protocol {
         }
         System.out.println("nb test : " + nbContains + " | computing time : " + (System.currentTimeMillis() - start));
         builder.append("\n");
-        return builder.toString();
+        String answer = builder.toString();
+        cache.add(clientInput,answer);
+        return answer;
     }
 }

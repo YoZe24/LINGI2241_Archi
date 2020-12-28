@@ -10,9 +10,12 @@ public class ClientLaunch {
 
     // Constantes
     static ArrayList<String> requestsDB;
-    static String host = "91.182.104.193";
+//    static String host = "192.168.1.52";
+    static String host = "149.126.75.6";
+
+//    static String host = "91.182.104.193";
     static final int port = 4444;
-    static final int nbClients = 100;
+    static final int nbClients = 10;
     static final Random rand = new Random();
     static long start;
     static int cpt = 0;
@@ -20,7 +23,7 @@ public class ClientLaunch {
     static float avg = 0;
     static List<Long> times;
 
-    static final float REQUEST_PACE = (float) 0.1; // Une requête toutes les X secondes
+    static final float REQUEST_PACE = (float) 2; // Une requête toutes les X secondes
     static final float LAMBDA = (float) 1/(REQUEST_PACE * 1000);
     static final int NB_REQUEST_PER_SEQ = 1;
     static final int NB_REQUEST = NB_REQUEST_PER_SEQ * 5;

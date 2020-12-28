@@ -1,4 +1,4 @@
-package ServerV1;
+package ServerSimple;
 
 import java.io.BufferedReader;
 import java.io.IOException;

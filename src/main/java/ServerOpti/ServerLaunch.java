@@ -1,4 +1,6 @@
-package ServerV2;
+package ServerOpti;
+
+
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -18,6 +20,7 @@ public class ServerLaunch {
     static final int N = 24422376;
     static final int N_TYPES = 6;
 
+    static Protocol protocol;
     // Base de données
     public static ArrayList<String>[] DATABASE;
 
@@ -28,6 +31,8 @@ public class ServerLaunch {
         for(int i = 0; i < N_TYPES ; i++){
             DATABASE[i] = new ArrayList<>();
         }
+
+        protocol = new Protocol();
 
         String readLine;
         BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/database.txt"));

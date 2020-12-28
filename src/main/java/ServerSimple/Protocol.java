@@ -1,4 +1,4 @@
-package ServerV1;
+package ServerSimple;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;

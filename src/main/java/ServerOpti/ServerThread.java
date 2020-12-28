@@ -1,4 +1,4 @@
-package ServerV2;
+package ServerOpti;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,16 +17,11 @@ public class ServerThread implements Runnable{
 
     // Méthode utilisée dans chaque thread pour gérer la requête d'un client
     public void run() {
-        try {
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
+        try (
+                PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            ){
             int cpt = 0;
-            //while(true) {
                 String client = in.readLine();
                 String request = in.readLine();
 
@@ -39,25 +34,18 @@ public class ServerThread implements Runnable{
                 }*/
 
                 // On process la requête et on affiche la réponse chez le client
-                Protocol protocol = new Protocol();
-                String answer = protocol.processInput(request);
+
+                String answer = ServerLaunch.protocol.processInput(request);
 
                 long start = System.currentTimeMillis();
                 //System.out.println("time before print the "+answer.length() + " char answer");
 
                 out.println(answer);
                 System.out.println("-> "+ ++cpt +" : Client #" +client+" served | time used to print : "+(System.currentTimeMillis() - start));
-            //}
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port " + ServerLaunch.port + " or listening for a connection");
             System.out.println(e.getMessage());
         }
 
-        try {
-            this.in.close();
-            this.out.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
