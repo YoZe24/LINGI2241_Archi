@@ -5,14 +5,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Protocol {
-    public ArrayList<String> processInput(String clientInput) {
-        ArrayList<String> answer = new ArrayList<>();
+    public String processInput(String clientInput) {
+        long start = System.currentTimeMillis();
 
         // Check si les arguments sont bons (rajouter des cas)
         if(!clientInput.contains(";")){
-            answer.add("Asked format : <types>;<regex>");
-            answer.add("\n");
-            return answer;
+            return "Asked format : <types>;<regex>\n";
         }
 
         // Récupère les arguments
@@ -30,26 +28,30 @@ public class Protocol {
         Pattern p = Pattern.compile(regex);
         Matcher m;
 
+        StringBuilder str = new StringBuilder();
         for (int i = 0; i < ServerLaunch.DATABASE.length; i++) {
             String currType = ServerLaunch.DATABASE[i][0];
             String currRegex = ServerLaunch.DATABASE[i][1];
 
+            m = p.matcher(currRegex);
             if(types.length == 0){
-                m = p.matcher(currRegex);
                 if(m.find()){
-                    answer.add(currRegex);
+                    str.append(currRegex);
                 }
             }
             else{
                 for (String type : types) {
-                    m = p.matcher(currRegex);
                     if (currType.equals(type) && m.find()) {
-                        answer.add(currRegex);
+                        str.append(currRegex);
                     }
                 }
             }
         }
-        answer.add("\n");
-        return answer;
+        System.out.println("computing time : " + (System.currentTimeMillis() - start));
+        synchronized (ServerLaunch.serviceTimes) {
+            ServerLaunch.serviceTimes.add(System.currentTimeMillis() - start);
+        }
+        str.append("\n");
+        return str.toString();
     }
 }

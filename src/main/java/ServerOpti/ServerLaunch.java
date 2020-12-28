@@ -4,10 +4,13 @@ package ServerOpti;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -15,11 +18,14 @@ public class ServerLaunch {
 
     // Constantes
     static final int port = 4444;
-    static final int nbThreads = 5;
+    static final int nbThreads = 8;
     static final int queueSize = 50;
     static final int N_TYPES = 6;
 
+    static long cpt = 0;
+    static long avgTime = 0;
     static long start;
+    static List<Long> serviceTimes;
     static Protocol protocol;
     // Base de données
     public static ArrayList<String>[] DATABASE;
@@ -32,10 +38,12 @@ public class ServerLaunch {
             DATABASE[i] = new ArrayList<>();
         }
 
+        serviceTimes = new ArrayList<>();
         protocol = new Protocol();
 
         String readLine;
         BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/database.txt"));
+
         ExecutorService pool = Executors.newFixedThreadPool(nbThreads);
 
         System.out.println("-> Server launched");
@@ -55,6 +63,7 @@ public class ServerLaunch {
             int cpt = 0;
             while(true){
                 synchronized (serverSocket) {
+
                     Socket clientSocket = serverSocket.accept();
                     System.out.println("Client " + ++cpt + " launched at : " + (System.currentTimeMillis()-start));
                     pool.execute(new ServerThread(clientSocket,cpt));
@@ -64,5 +73,20 @@ public class ServerLaunch {
             System.out.println("Exception caught when trying to listen on port " + port + " or listening for a connection");
             System.out.println(e.getMessage());
         }
+    }
+
+    public static void writeToFile(Collection collection, String fileName) throws IOException {
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter("src/main/resources/"+fileName);
+        } catch (IOException e) {
+            writer = new FileWriter(fileName);
+        }
+        StringBuilder str = new StringBuilder();
+        for(Object o: collection){
+            str.append(o.toString()).append("\n");
+        }
+        writer.write(str.toString() + "\n");
+        writer.close();
     }
 }

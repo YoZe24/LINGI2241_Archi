@@ -9,8 +9,6 @@ import java.net.Socket;
 public class ServerThread implements Runnable{
     private final Socket clientSocket;
     private final int id;
-    private PrintWriter out;
-    private BufferedReader in;
 
     public ServerThread(Socket clientSocket, int id) {
         this.clientSocket = clientSocket;
@@ -19,22 +17,21 @@ public class ServerThread implements Runnable{
 
     // Méthode utilisée dans chaque thread pour gérer la requête d'un client
     public void run() {
+        long startServe = System.currentTimeMillis();
         try (
             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         ){
-            System.out.println("Client "+id+" started at " + (System.currentTimeMillis()-ServerLaunch.start) );
-            int cpt = 0;
-            String client = in.readLine();
+            //String client = in.readLine();
             String request = in.readLine();
 
-            /*if (request.equals("Exit")) {
-                System.out.println("Client #" + client + " sends exit...");
-                out.println("Exit");
+            if(request.equals("Exit.")) {
+                ServerLaunch.writeToFile(ServerLaunch.serviceTimes, "results/service_5_network.txt");
                 this.clientSocket.close();
-                System.out.println("Closed");
-                break;
-            }*/
+            }
+
+            System.out.println("Time to read : "+(System.currentTimeMillis()-startServe));
+
 
             // On process la requête et on affiche la réponse chez le client
             String answer = ServerLaunch.protocol.processInput(request);
@@ -43,11 +40,15 @@ public class ServerThread implements Runnable{
             //System.out.println("time before print the "+answer.length() + " char answer");
 
             out.println(answer);
-            System.out.println("-> "+ ++cpt +" : Client #" +client+" served | time used to print : "+(System.currentTimeMillis() - start));
+            System.out.println("-> "+ ++ServerLaunch.cpt +" : Client # served | time used to print : "+(System.currentTimeMillis() - start));
+            long timeToServe = System.currentTimeMillis()-startServe;
+            ServerLaunch.avgTime += timeToServe;
+            System.out.println("Time to serve : " +timeToServe);
+
+            System.out.println("Mean serve time "+ServerLaunch.avgTime/ServerLaunch.cpt);
         } catch (IOException e) {
             System.out.println("Exception caught when trying to listen on port " + ServerLaunch.port + " or listening for a connection");
             System.out.println(e.getMessage());
         }
-
     }
 }
