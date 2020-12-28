@@ -13,7 +13,7 @@ public class Protocol {
     private CacheLFU cache;
 
     public Protocol(){
-        cache = new CacheLFU(100,5);
+        cache = new CacheLFU(30,5);
     }
 
     public String processInput(String clientInput) {
