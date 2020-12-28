@@ -59,7 +59,11 @@ public class RegexGenerator {
             String type = database[lines[i]][0];
             String[] line = database[lines[i]][1].split(" ",10);
 
-            while(String.join(" ",line).contains("*") || String.join(" ",line).contains("(") || String.join(" ",line).contains("[")){
+            while(String.join(" ",line).contains("*")
+                    || String.join(" ",line).contains("(")
+                    || String.join(" ",line).contains("[")
+                    || String.join(" ",line).contains(")")
+                    || String.join(" ",line).contains("]")){
                 lines[i]++;
                 type = database[lines[i]][0];
                 line = database[lines[i]][1].split(" ",10);

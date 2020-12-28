@@ -10,9 +10,9 @@ public class ClientLaunch {
 
     // Constantes
     static ArrayList<String> requestsDB;
-    static String host = "192.168.0.12";
+    static String host = "91.182.104.193";
     static final int port = 4444;
-    static final int nbClients = 10;
+    static final int nbClients = 100;
     static final Random rand = new Random();
     static long start;
     static int cpt = 0;
@@ -20,7 +20,7 @@ public class ClientLaunch {
     static float avg = 0;
     static List<Long> times;
 
-    static final float REQUEST_PACE = (float) 5; // Une requête toutes les X secondes
+    static final float REQUEST_PACE = (float) 0.1; // Une requête toutes les X secondes
     static final float LAMBDA = (float) 1/(REQUEST_PACE * 1000);
     static final int NB_REQUEST_PER_SEQ = 1;
     static final int NB_REQUEST = NB_REQUEST_PER_SEQ * 5;
@@ -31,7 +31,7 @@ public class ClientLaunch {
 
     // Main
     public static void main(String[] args) throws InterruptedException, IOException {
-        generateRequests(hard);
+        generateRequests(easy);
         System.out.println("Lambda : "+LAMBDA + " NB request per batch "+NB_REQUEST_PER_SEQ+ " PACE "+REQUEST_PACE);
 
         times = new ArrayList<>();
