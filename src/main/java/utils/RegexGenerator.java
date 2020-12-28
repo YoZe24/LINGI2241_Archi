@@ -6,7 +6,7 @@ import java.util.Random;
 
 public class RegexGenerator {
     // Modify here :
-    static final int numberNeeded = 100;
+    static final int numberNeeded = 1000;
 
     // Don't touch
     static final String[][] database = new String[2442236][2];
@@ -19,6 +19,9 @@ public class RegexGenerator {
 
         init();
         generateEasy();
+
+        reset();
+        generateMedium();
 
         reset();
         generateHard();
@@ -80,6 +83,37 @@ public class RegexGenerator {
             writer = new FileWriter("src/main/resources/requests/easy.txt");
         } catch (IOException e) {
             writer = new FileWriter("requests/easy.txt");
+        }
+        for (int i = 0; i < numberNeeded; i++) {
+            writer.write(regexList.get(i).toString() + "\n");
+        }
+        writer.close();
+    }
+
+    static void generateMedium() throws IOException {
+        int[] lines = rand.ints(1, 2442235).distinct().limit(numberNeeded).toArray();
+
+        for (int i = 0; i < numberNeeded; i++) {
+            String[] line = database[lines[i]][1].split("\\.",1);
+
+            while(String.join(" ",line).contains("*")
+                    || String.join(" ",line).contains("(")
+                    || String.join(" ",line).contains("[")
+                    || String.join(" ",line).contains(")")
+                    || String.join(" ",line).contains("]")){
+                lines[i]++;
+                line = database[lines[i]][1].split("\\.",1);
+            }
+
+            regexList.get(i).append(";");
+            regexList.get(i).append(String.join(" ",line));
+        }
+
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter("src/main/resources/requests/medium.txt");
+        } catch (IOException e) {
+            writer = new FileWriter("requests/medium.txt");
         }
         for (int i = 0; i < numberNeeded; i++) {
             writer.write(regexList.get(i).toString() + "\n");

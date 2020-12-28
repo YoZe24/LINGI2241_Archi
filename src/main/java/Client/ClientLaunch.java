@@ -11,9 +11,9 @@ public class ClientLaunch {
     // Constantes
     static ArrayList<String> requestsDB;
 //    static String host = "192.168.1.52";
-    static String host = "149.126.75.6";
+//    static String host = "149.126.75.6";
 
-//    static String host = "91.182.104.193";
+    static String host = "192.168.0.12";
     static final int port = 4444;
     static final int nbClients = 10;
     static final Random rand = new Random();
@@ -31,10 +31,11 @@ public class ClientLaunch {
     static final String easy = "easy.txt";
     static final String hard = "hard.txt";
     static final String network = "network.txt";
+    static final String medium = "medium.txt";
 
     // Main
     public static void main(String[] args) throws InterruptedException, IOException {
-        generateRequests(easy);
+        generateRequests(medium);
         System.out.println("Lambda : "+LAMBDA + " NB request per batch "+NB_REQUEST_PER_SEQ+ " PACE "+REQUEST_PACE);
 
         times = new ArrayList<>();
