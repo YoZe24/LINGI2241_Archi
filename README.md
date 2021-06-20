@@ -1,4 +1,5 @@
-How to run the project ?
+## Repository for the project of the course LINGI2241 - Architecture and Performances of Computer Systems
+### How to run the project ?
 ------------------------
 
 1. Using maven project
