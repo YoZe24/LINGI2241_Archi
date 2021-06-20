@@ -3,7 +3,7 @@
 ------------------------
 
 1. Using maven project
-- 0pen the project with the pom.xml file
+- Open the project with the pom.xml file
 - Launch one server (Simple or Opti) | Set your parameters for the server
 - Launch the client | Set your parameters in the ClientLaunch.java file
 
